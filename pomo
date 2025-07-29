@@ -36,6 +36,7 @@ print_help() {
   exit 1
 }
 
+# If no time specified by the user RTFM
 if [[ -z "${TIME}" ]]; then
 	print_help
 fi
@@ -57,5 +58,6 @@ if [[ "${focus_time}" -gt 0 ]]; then
 	# Set finish notification
 	echo 'notify-send "Pomo" "Focus is over"' | at "${timer_expire}" &>/dev/null
 else
+	# If the focus time is zero RTFM
 	print_help
 fi
