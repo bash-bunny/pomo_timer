@@ -2,6 +2,12 @@
 
 Pomodoro Timer written in bash.
 
+The script shows a notification when it starts with the time when it will finish, and another one when it finish.
+
+![Pomo Start](images/pomo_start.png)
+
+![Pomo Finish](images/pomo_finish.png)
+
 ## Requirements
 
 - `at` to schedule commands

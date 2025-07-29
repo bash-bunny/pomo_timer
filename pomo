@@ -36,9 +36,6 @@ print_help() {
   exit 1
 }
 
-print_tree() {
-
-
 if [[ -z "${TIME}" ]]; then
 	print_help
 fi
