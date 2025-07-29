@@ -1,0 +1,64 @@
+#!/usr/bin/sh
+
+# Get actual date from the system and the timer from the user
+ACTUAL_DATE=$(date +%s)
+TIME="${1}"
+
+# Convert to seconds
+convert_seconds() {
+	# Time to convert to seconds
+  num="${1}"
+	# Unit timer
+	unit="${2}"
+	# Result
+	focus_time=0
+
+	case "${unit}" in
+		"s")
+			focus_time=$((1*${num}))
+			;;
+		"m")
+			focus_time=$((60*${num}))
+			;;
+		"h")
+			focus_time=$((120*${num}))
+			;;
+		*)
+			focus_time=0
+			;;
+	esac
+
+	return "${focus_time}"
+}
+
+print_help() {
+  printf "Usage: \n# Focus 60 seconds\npomo 60s\n# Focus 1 hour\npomo 1h\n"
+  exit 1
+}
+
+print_tree() {
+
+
+if [[ -z "${TIME}" ]]; then
+	print_help
+fi
+
+# Extract the number and unit
+num="${TIME//[!0-9]/}"
+unit="${TIME//[0-9]/}"
+
+# Calculate the seconds
+convert_seconds "${num}" "${unit}"
+
+if [[ "${focus_time}" -gt 0 ]]; then
+	# Add it to the actual date
+	total_time=$((${ACTUAL_DATE} + ${focus_time}))
+	# Calculate the final hour where the timer expire
+	timer_expire=$(date --date="@${total_time}" +%R)
+	# Send init notification
+	notify-send "Pomo" "Focus time until ${timer_expire}!"
+	# Set finish notification
+	echo 'notify-send "Pomo" "Focus is over"' | at "${timer_expire}" &>/dev/null
+else
+	print_help
+fi
