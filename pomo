@@ -32,7 +32,7 @@ convert_seconds() {
 }
 
 print_help() {
-  printf "Usage: \n# Focus 60 seconds\npomo 60s\n# Focus 1 hour\npomo 1h\n"
+  printf "Usage: \n# Focus 30 seconds\npomo 30s\n# Focus 45 minutes\npomo 45m\n# Focus 1 hour\npomo 1h\n"
   exit 1
 }
 
