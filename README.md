@@ -18,8 +18,8 @@ You can clone the whole repository.
 ```bash
 # Clone the repo
 git clone https://github.com/bash-bunny/pomo_timer.git
-# Copy the script to your path
-cp pomo ~/.local/bin
+# Move it the script to your PATH
+mv pomo ~/.local/bin
 # Give it permissions
 chmod u+x ~/.local/bin/pomo
 ```
@@ -27,7 +27,12 @@ chmod u+x ~/.local/bin/pomo
 Or you can just download the bash script.
 
 ```bash
-
+# Download the script
+curl -sSLOfk https://raw.githubusercontent.com/bash-bunny/pomo_timer/refs/heads/main/pomo
+# Move it to your PATH
+mv pomo ~/.local/bin
+# Give it permissions
+chmod u+x pomo
 ```
 
 ## Usage
