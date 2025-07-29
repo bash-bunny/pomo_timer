@@ -12,10 +12,10 @@ The script shows a notification when it starts with the time when it will finish
 
 - `at` to schedule commands
     - [at command](https://salsa.debian.org/debian/at)
-- `dunst` to send notifications
+- `dunst` notifications daemon (you can use any notification daemon)
     - [dunst arch wiki](https://wiki.archlinux.org/title/Dunst)
-
-**Note**: The script make use of `notify-send` so be sure to have it on your system.
+- `libnotify` library to send notifications (this allows you to use the `notify-send` command)
+    - [libnotify arch wiki](https://wiki.archlinux.org/title/Desktop_notifications#Libnotify)
 
 ## Installation
 
