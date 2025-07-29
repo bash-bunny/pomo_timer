@@ -21,7 +21,7 @@ convert_seconds() {
 			focus_time=$((60*${num}))
 			;;
 		"h")
-			focus_time=$((120*${num}))
+			focus_time=$((3600*${num}))
 			;;
 		*)
 			focus_time=0
