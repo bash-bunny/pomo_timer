@@ -47,11 +47,11 @@ chmod u+x pomo
 # Show the help or other pomodoro sessions running
 pomo
 
-# Focus for 60 seconds
-pomo 60s
+# Focus for 45 minutes
+pomo 45m
 
-# Focus for 1 hour
-pomo 1h
+# Focus for 2 hours
+pomo 2h
 ```
 
 To manage the scheduled tasks with `at` use:
