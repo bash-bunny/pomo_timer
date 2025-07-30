@@ -1,39 +1,59 @@
 #!/usr/bin/sh
 
-# Get actual date from the system and the timer from the user
+# Get the timer from the user
 ACTUAL_DATE=$(date +%s)
 TIME="${1}"
 
-# Convert to seconds
-convert_seconds() {
-	# Time to convert to seconds
+print_help() {
+  printf "Usage: \n# Focus 45 minutes\npomo 45m\n# Focus 1 hour\npomo 1h\n"
+  exit 1
+}
+
+# Check if other pomodoro exists and if so exit
+check_pomo() {
+	for i in $(atq | awk '{print $1}');
+	do
+		if at -c "${i}" | grep -i pomo &>/dev/null; then
+			notify-send "Pomo" "You already have a pomo until: $(atq "${i}" | awk '{print $5}')"
+			exit 1
+		fi
+	done
+}
+
+# Convert m or h into minutes and hours
+focus_time() {
+	# Time to focus
   num="${1}"
 	# Unit timer
 	unit="${2}"
-	# Result
-	focus_time=0
 
 	case "${unit}" in
-		"s")
-			focus_time=$((1*${num}))
-			;;
 		"m")
-			focus_time=$((60*${num}))
+			seconds=$((60 * "${num}"))
+			send_notification "${num}" "minutes" "${seconds}"
 			;;
 		"h")
-			focus_time=$((3600*${num}))
+			seconds=$((3600 * "${num}"))
+			send_notification "${num}" "hours" "${seconds}"
 			;;
 		*)
-			focus_time=0
+			print_help
 			;;
 	esac
-
-	return "${focus_time}"
 }
 
-print_help() {
-  printf "Usage: \n# Focus 30 seconds\npomo 30s\n# Focus 45 minutes\npomo 45m\n# Focus 1 hour\npomo 1h\n"
-  exit 1
+send_notification() {
+	num="${1}"
+	unit="${2}"
+	seconds="${3}"
+	# Get the date until it focus
+	total_time=$((${ACTUAL_DATE} + ${seconds}))
+	# Calculate the final hour where the timer expire
+	timer_expire=$(date --date="@${total_time}" +%R)
+	# Send init notification
+	notify-send "Pomo" "Focus time until ${timer_expire}!"
+	# Set finish notification
+	echo 'notify-send "Pomo" "Focus is over"' | at now + "${num}" "${unit}" &>/dev/null
 }
 
 # If no time specified by the user RTFM
@@ -41,23 +61,12 @@ if [[ -z "${TIME}" ]]; then
 	print_help
 fi
 
+# Check existing pomodoro sessions
+check_pomo
+
 # Extract the number and unit
 num="${TIME//[!0-9]/}"
 unit="${TIME//[0-9]/}"
 
 # Calculate the seconds
-convert_seconds "${num}" "${unit}"
-
-if [[ "${focus_time}" -gt 0 ]]; then
-	# Add it to the actual date
-	total_time=$((${ACTUAL_DATE} + ${focus_time}))
-	# Calculate the final hour where the timer expire
-	timer_expire=$(date --date="@${total_time}" +%R)
-	# Send init notification
-	notify-send "Pomo" "Focus time until ${timer_expire}!"
-	# Set finish notification
-	echo 'notify-send "Pomo" "Focus is over"' | at "${timer_expire}" &>/dev/null
-else
-	# If the focus time is zero RTFM
-	print_help
-fi
+focus_time "${num}" "${unit}"
