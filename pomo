@@ -64,5 +64,5 @@ check_pomo
 num="${TIME//[!0-9]/}"
 unit="${TIME//[0-9]/}"
 
-# Calculate the seconds
+# Get the focus time and start the pomodoro
 focus_time "${num}" "${unit}"
