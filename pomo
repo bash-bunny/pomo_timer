@@ -29,12 +29,10 @@ focus_time() {
 
 	case "${unit}" in
 		"m")
-			seconds=$((60 * "${num}"))
-			send_notification "${num}" "minutes" "${seconds}"
+			send_notification "${num}" "minutes"
 			;;
 		"h")
-			seconds=$((3600 * "${num}"))
-			send_notification "${num}" "hours" "${seconds}"
+			send_notification "${num}" "hours"
 			;;
 		*)
 			print_help
@@ -45,15 +43,13 @@ focus_time() {
 send_notification() {
 	num="${1}"
 	unit="${2}"
-	seconds="${3}"
-	# Get the date until it focus
-	total_time=$((${ACTUAL_DATE} + ${seconds}))
-	# Calculate the final hour where the timer expire
-	timer_expire=$(date --date="@${total_time}" +%R)
-	# Send init notification
-	notify-send "Pomo" "Focus time until ${timer_expire}!"
 	# Set finish notification
 	echo 'notify-send "Pomo" "Focus is over"' | at now + "${num}" "${unit}" &>/dev/null
+	# Ugly one liner to get the expiration time
+	timer_expire=$(atq $(atq | awk '{print $1}' \
+	| parallel 'at -c {} | grep -i pomo &>/dev/null && echo {}') | awk '{print $5}')
+	# Send init notification
+	notify-send "Pomo" "Focus time until ${timer_expire}!"
 }
 
 # If no time specified by the user RTFM
