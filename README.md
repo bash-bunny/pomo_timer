@@ -2,7 +2,7 @@
 
 Pomodoro Timer written in bash.
 
-The script shows a notification when it starts with the time when it will finish, and another one when it finish.
+The script shows a notification when it starts with the time when it will finish, and another one when it finish, and if it's already running you can check until when with the command `pomo`.
 
 ![Pomo Start](images/pomo_start.png)
 
@@ -44,7 +44,7 @@ chmod u+x pomo
 ## Usage
 
 ```bash
-# Show the help
+# Show the help or other pomodoro sessions running
 pomo
 
 # Focus for 60 seconds
@@ -52,4 +52,12 @@ pomo 60s
 
 # Focus for 1 hour
 pomo 1h
+```
+
+To manage the scheduled tasks with `at` use:
+
+```bash
+atq # show the jobs scheduled
+at -c ID # show the information about a particular job
+atrm ID # remove a particular job
 ```

@@ -1,26 +1,26 @@
-#!/usr/bin/sh
+#!/usr/bin/bash
 
 # Get the timer from the user
-ACTUAL_DATE=$(date +%s)
 TIME="${1}"
 
+# Help on how to use the command
 print_help() {
-  printf "Usage: \n# Focus 45 minutes\npomo 45m\n# Focus 1 hour\npomo 1h\n"
-  exit 1
+	printf "Usage: \n# Print help or notify pomodoro sessions running\npomo\n# Focus 45 minutes\npomo 45m\n# Focus 1 hour\npomo 1h\n"
 }
 
-# Check if other pomodoro exists and if so exit
+# Check if there are other pomodoro running
 check_pomo() {
-	for i in $(atq | awk '{print $1}');
-	do
-		if at -c "${i}" | grep -i pomo &>/dev/null; then
-			notify-send "Pomo" "You already have a pomo until: $(atq "${i}" | awk '{print $5}')"
-			exit 1
-		fi
-	done
+	atid=$(atq | awk '{print $1}' | xargs -I{} bash -c "at -c {} | grep Pomo &>/dev/null && echo {}")
+	if [[ -n "${atid}" ]]; then
+		timer=$(atq "${atid}" | awk '{print $5}')
+		notify-send "Pomo" "Pomodoro sesion running until: ${timer}"
+		exit 1
+	fi
+	exit 0
 }
 
 # Convert m or h into minutes and hours
+# and send a notification
 focus_time() {
 	# Time to focus
   num="${1}"
@@ -40,29 +40,32 @@ focus_time() {
 	esac
 }
 
+# Notify the user and schedule the command
 send_notification() {
 	num="${1}"
 	unit="${2}"
 	# Set finish notification
 	echo 'notify-send "Pomo" "Focus is over"' | at now + "${num}" "${unit}" &>/dev/null
-	# Ugly one liner to get the expiration time
-	timer_expire=$(atq $(atq | awk '{print $1}' \
-	| parallel 'at -c {} | grep -i pomo &>/dev/null && echo {}') | awk '{print $5}')
-	# Send init notification
-	notify-send "Pomo" "Focus time until ${timer_expire}!"
+	# Check the pomodore session
+	check_pomo
 }
 
 # If no time specified by the user RTFM
 if [[ -z "${TIME}" ]]; then
-	print_help
+	if $(check_pomo);  then
+		print_help
+	fi
+	exit 1
 fi
-
-# Check existing pomodoro sessions
-check_pomo
 
 # Extract the number and unit
 num="${TIME//[!0-9]/}"
 unit="${TIME//[0-9]/}"
 
-# Get the focus time and start the pomodoro
-focus_time "${num}" "${unit}"
+# Check other pomodoro sessions
+if ! $(check_pomo) ; then
+	exit 1
+else
+	# Get the focus time and start the pomodoro
+	focus_time "${num}" "${unit}"
+fi
